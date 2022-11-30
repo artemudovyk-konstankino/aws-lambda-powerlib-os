@@ -1,0 +1,37 @@
+name: Code Quality
+
+on: [push]
+
+jobs:
+  check_integration:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+    if: "!startsWith(github.event.head_commit.message, 'bump:')"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.9
+
+      - name: Cache Python dependencies
+        id: cache-poetry
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry/virtualenvs
+          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+
+      - name: Install Poetry and dependencies
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          poetry check
+          poetry install
+
+      - name: Lint with pre-commit hooks from .pre-commit-config.yaml
+        run: poetry run pre-commit run --all-files
+
+      - name: Test with PyTest
+        run: poetry run pytest -v

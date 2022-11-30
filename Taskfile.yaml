@@ -1,0 +1,51 @@
+version: '3'
+
+includes:
+  test: ./tests/TestTasks.yaml
+
+tasks:
+  install:
+    desc: Configure python virtual environment.
+    vars:
+      PYTHON_VERSION: 3.9.13
+    cmds:
+      - pyenv install {{.PYTHON_VERSION}} --skip-existing
+      - pyenv local {{.PYTHON_VERSION}}
+      - poetry install
+      - poetry run pre-commit install
+      - poetry run pre-commit install --hook-type commit-msg
+
+  build:
+    desc: Build Python package.
+    cmds:
+      - poetry build
+
+  lint:
+    desc: Lint and format all files.
+    cmds:
+      - task: black
+      - task: isort
+      - task: flake8
+
+  black:
+    desc: Format all files.
+    dir: ./src
+    cmds:
+      - black . --skip-string-normalization
+
+  isort:
+    desc: Sort imports in all files.
+    dir: ./src
+    cmds:
+      - isort . --profile black --py 39 --skip-gitignore
+
+  flake8:
+    desc: Lint all files with flake8.
+    dir: ./src
+    cmds:
+      - flake8 . --max-line-length=120 --exclude __pycache__,tmp
+
+  pre-commit:
+    desc: Run all linting and formatting checks that configured in pre-commit.
+    cmds:
+      - pre-commit run --all-files

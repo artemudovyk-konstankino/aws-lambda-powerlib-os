@@ -1,0 +1,87 @@
+[tool.poetry]
+name = "aws_lambda_powerlib"
+version = "1.2.0"
+description = "AWS Lambda PowerLib."
+authors = ["Artem Udovyk <udovyk.a@konstankino.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+boto3 = "^1.24.23"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.1.2"
+pytest-mock = "^3.8.2"
+moto = {extras = ["s3"], version = "^3.1.16"}
+black = "^22.6.0"
+pre-commit = "^2.19.0"
+pytest-cov = "^3.0.0"
+commitizen = "^2.28.0"
+isort = "^5.10.1"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.commitizen]
+name = "cz_customize"
+version = "1.2.0"
+version_files = [
+    "aws_lambda_powerlib/__version__.py",
+    "pyproject.toml:version"
+]
+style = [
+    ["qmark", "fg:#ff9d00 bold"],
+    ["question", "bold"],
+    ["answer", "fg:#ff9d00 bold"],
+    ["pointer", "fg:#ff9d00 bold"],
+    ["highlighted", "fg:#ff9d00 bold"],
+    ["selected", "fg:#cc5454"],
+    ["separator", "fg:#cc5454"],
+    ["instruction", ""],
+    ["text", ""],
+    ["disabled", "fg:#858585 italic"]
+]
+
+[tool.commitizen.customize]
+message_template = "{{change_type}}:{% if show_message %} {{message}}{% endif %}"
+example = "feature: this feature enable customize through config file"
+schema = '''
+<type>(<scope>): <subject>
+<BLANK LINE>
+<body>
+<BLANK LINE>
+(BREAKING CHANGE: )<footer>'''
+schema_pattern = "(build|ci|docs|feat|fix|perf|refactor|style|test|chore|revert|bump)(\\(\\S+\\))?!?:(\\s.*)"
+info_path = "cz_customize_info.txt"
+info = """
+This is customized info
+"""
+commit_parser = "^(?P<change_type>feat|fix|refactor|perf|build|test|ci|chore|docs|style|revert|BREAKING CHANGE)(?:\\((?P<scope>[^()\\r\\n]*)\\)|\\()?(?P<breaking>!)?:\\s(?P<message>.*)?"
+
+# Changelog
+changelog_incremental = true
+change_type_order = ["BREAKING CHANGE", "Feat", "Fix", "Refactor", "Perf", "Build", "CI", "Tests", "Docs", "Chore", "Style"]
+change_type_map = { "feat" = "Feat", "fix" = "Fix", "refactor" = "Refactor", "perf" = "Perf", "build" = "Build", "test" = "Tests", "ci" = "CI", "chore" = "Chore", "docs" = "Docs", "style" = "Style", "revert" = "Revert" }
+changelog_pattern = "^(feat|fix|refactor|perf|build|test|ci|docs|chore|style|revert|BREAKING CHANGE)?(!)?"
+
+# Bump
+bump_pattern = "^(BREAKING[\\-\\ ]CHANGE|feat|fix|refactor|perf|build|test|ci|docs|chore|style|revert)(\\(.+\\))?(!)?"
+bump_map = {"^.+!$" = "MAJOR", "^BREAKING[\\-\\ ]CHANGE" = "MAJOR", "feat" = "MINOR", "fix" = "PATCH", "refactor" = "PATCH", "perf" = "PATCH", "build" = "PATCH", "test" = "PATCH", "ci" = "PATCH", "style" = "PATCH", "revert" = "PATCH" }
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "change_type"
+# choices = [{value = "feature", name = "feature: A new feature."}, {value = "fix", name = "fix: A bug fix."}]
+choices = ["feature", "fix", "refactor", "perf", "build", "ci", "test", "docs", "style", "chore"]  # short version
+message = "Select the type of change you are committing"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "message"
+message = "Body."
+
+[[tool.commitizen.customize.questions]]
+type = "confirm"
+name = "show_message"
+message = "Do you want to add body message in commit?"

@@ -1,0 +1,27 @@
+# https://taskfile.dev
+
+version: "3"
+
+vars:
+  FLAGS: -vvs
+  COVERAGE: --cov
+  COVERAGE_REPORT_DIRECTORY: ./coverage_report
+  COVERAGE_REPORT: --cov-report html:{{.COVERAGE_REPORT_DIRECTORY}}
+
+tasks:
+  all:
+    desc: Run all tests.
+    cmds:
+      - pytest {{.FLAGS}} {{.COVERAGE}} {{.COVERAGE_REPORT}}
+
+  custom:
+    desc: Run test for custom path. Run command as `task test:custom -- <path>`.
+    cmds:
+      - pytest {{.FLAGS}} {{.COVERAGE}} {{.COVERAGE_REPORT}} {{.CLI_ARGS}}
+
+  serve_cov_report:
+    desc: Serve the coverage report.
+    vars:
+      PORT: 7878
+    cmds:
+      - python -m http.server --directory {{.COVERAGE_REPORT_DIRECTORY}} {{.PORT}}
